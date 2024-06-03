@@ -1,10 +1,12 @@
 #include <ArduinoMqttClient.h>
 #include <WiFiNINA.h>
+#include <Servo.h>
 #include "secrets.h"
 
+Servo myservo;
 
-
-const int buttonPin = 2; 
+const int buttonPin = 2;
+const int servoPin = 9;
 
 int buttonState  = 0;
 int toggle = 0;
@@ -23,7 +25,8 @@ const char topic[] = TOPIC;
 
 
 void setup() {
-  Serial.begin(9000);
+  Serial.begin(9600);
+  myservo.attach(servoPin);
 
   pinMode(buttonPin, INPUT);
 
@@ -44,6 +47,7 @@ void setup() {
 
   mqttClient.subscribe(topic);
 
+  myservo.write(140);
 }
 
 
@@ -60,6 +64,24 @@ void loop() {
     publish("Off");
     Serial.println("Off");
     toggle = 0;
+  }
+
+  int messageSize = mqttClient.parseMessage();
+  String message;
+  for (int i = 0; i <messageSize; i++)
+  {
+    message += (char)mqttClient.read();
+  }
+  if (messageSize !=0)
+  {
+    if (message == "Unlock")
+    {
+      myservo.write(40);
+    }
+    else if (message == "Lock")
+    {
+      myservo.write(140);
+    }
   }
 
 }
