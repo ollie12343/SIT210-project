@@ -1,7 +1,15 @@
+import cv2
 from paho.mqtt import client as mqtt_client
 import random
 import time
+import threading
 
+# python 3.11
+
+import random
+import time
+
+from paho.mqtt import client as mqtt_client
 
 
 broker = 'broker.emqx.io'
@@ -51,9 +59,40 @@ def subscribe(client: mqtt_client):
     client.subscribe(topic)
     client.on_message = on_message
 
-
-if __name__ == '__main__':
+def pub():
+    pub = connect_mqtt(pub_client_id)
     
+    pub.loop_start()
+    publish(pub)
+    pub.loop_stop()
+    
+def sub():
     sub = connect_mqtt(sub_client_id)
     subscribe(sub)
     sub.loop_forever()
+
+
+if __name__ == '__main__':
+    
+    sub()
+    
+    # t1 = threading.Thread(pub)
+    # t2 = threading.Thread(sub)
+    
+    # t2.start()
+    # t1.start()
+    
+    # t1.join()
+    # t2.join()
+
+
+    
+"""
+image = cv2.imread("test.png")
+
+cv2.imshow("Display", image)
+
+cv2.waitKey(0)
+
+cv2.destoryAllWindows()
+"""
